@@ -65,5 +65,10 @@ class MessagesViewController: MSMessagesAppViewController {
     
         // Use this method to finalize any behaviors associated with the change in presentation style.
     }
+   
+    @IBAction func goBack(sender: UIButton) {
+	// Go back to compact view when the user presses the back button
+        self.willTransition(to: MSMessagesAppPresentationStyle.compact))
+    }
 
 }

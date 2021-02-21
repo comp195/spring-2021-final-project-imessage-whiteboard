@@ -1,0 +1,48 @@
+Basic materials
+https://developer.apple.com/imessage/
+https://medium.com/swift-programming/learn-how-to-build-an-imessage-app-with-swift-7b106ce9b033 
+
+week 1: turn in design documentation and learn swift basics
+loops/functions/classes
+variables/typing
+data structures/common libraries
+compiling/running/debugging
+learn xcode basics
+
+week 2: go through the tutorial for making an ice cream app 
+https://developer.apple.com/documentation/messages/icecreambuilder_building_an_imessage_extension 
+get ahead if possible, the future weeks are crammed
+
+week 3: learn how to make a simple UI that looks like a whiteboard
+no functionality yet, just something that says “welcome to your whiteboard” and has the layout I want
+should go to fullscreen mode when clicked, not taking up the bottom half of the iMessage screen like the default does
+
+week 4: learn to take user input from a stylus or finger 
+https://developer.apple.com/documentation/uikit/touches_presses_and_gestures/leveraging_touch_input_for_drawing_apps 
+
+week 5 and 6: add text options and draw out the client server architecture
+how does one client’s drawn changes get communicated to the server? Is there an object that gets sent via socket programming? TCP or UDP? or websockets?
+what language is the server written in and where? May make the most sense to set up a web server in AWS and use WebSockets for the ios side, as discussed here https://www.appcoda.com/socket-io-chat-app/ (download the tutorial in this link)
+open source collaborative whiteboard https://github.com/lovasoa/whitebophir 
+
+week 7: learn to split into threads and export as pdf
+https://medium.com/better-programming/threading-in-swift-simply-explained-5c8dd680b9b2 
+https://hackernoon.com/swift-multi-threading-using-gcd-for-beginners-2581b7aa21cb 
+consider realm instead of threads: https://realm.io/ realtime collaboration
+
+week 8: start on bulletin board mode
+how to insert media
+split layout into whiteboard and bulletin board with vertical line
+should I make the vertical line movable by the user?
+
+week 9: built in cushion week in case I’m behind
+
+week 10: start to test with real devices?
+ethernet connection will work I think
+
+week 11: fix any bugs found in week 10
+
+week 12: package it for ios store
+
+week 13: turn it in and present at symposium 
+

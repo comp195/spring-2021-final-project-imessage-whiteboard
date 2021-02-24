@@ -15,6 +15,13 @@ class MessagesViewController: MSMessagesAppViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         self.willTransition(to: MSMessagesAppPresentationStyle.expanded)
+
+	// establish the port connection here
+	// to do: how to find the ip address of the other user so we can establish the port connection?
+	var inputStream: InputStream!
+	var outputStream: OutputStream!
+
+	// put the user in drawing mode automatically?
     }
     
     // MARK: - Conversation Handling

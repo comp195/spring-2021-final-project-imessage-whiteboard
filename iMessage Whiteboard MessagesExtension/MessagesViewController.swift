@@ -4,24 +4,35 @@
 //
 //  Created by Cassidy Johnson on 1/30/21.
 //
-// Making my first swift comment!
+//  Making my first swift comment!
 
 import UIKit
 import Messages
 
 class MessagesViewController: MSMessagesAppViewController {
+    var lastPoint = CGPoint.zero
+    var color = UIColor.black
+    var brushWidth: CGFloat = 10.0
+    var opacity: CGFloat = 1.0
+    var swiped = false
     
+    /* the above is code I'm using from a tutorial at https://www.raywenderlich.com/5895-uikit-drawing-tutorial-how-to-make-a-simple-drawing-app */
+    
+    @IBOutlet weak var TempImageView: UIImageView!
+    @IBOutlet weak var MainImageView: UIImageView!
+    
+    // Messages functions
     override func viewDidLoad() {
         super.viewDidLoad()
+
         // Do any additional setup after loading the view.
         self.willTransition(to: MSMessagesAppPresentationStyle.expanded)
+        // establish the port connection here
+        // to do: how to find the ip address of the other user so we can establish the port connection?
+        // var _: InputStream!
+        // var outputStream: OutputStream!
 
-	// establish the port connection here
-	// to do: how to find the ip address of the other user so we can establish the port connection?
-	var inputStream: InputStream!
-	var outputStream: OutputStream!
-
-	// put the user in drawing mode automatically?
+        // put the user in drawing mode automatically?
     }
     
     // MARK: - Conversation Handling
@@ -29,8 +40,6 @@ class MessagesViewController: MSMessagesAppViewController {
     override func willBecomeActive(with conversation: MSConversation) {
         // Called when the extension is about to move from the inactive to active state.
         // This will happen when the extension is about to present UI.
-
-        
         // Use this method to configure the extension and restore previously stored state.
     }
     
@@ -65,6 +74,7 @@ class MessagesViewController: MSMessagesAppViewController {
         // Called before the extension transitions to a new presentation style.
     
         // Use this method to prepare for the change in presentation style.
+        self.requestPresentationStyle(presentationStyle)
     }
     
     override func didTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
@@ -72,10 +82,78 @@ class MessagesViewController: MSMessagesAppViewController {
     
         // Use this method to finalize any behaviors associated with the change in presentation style.
     }
-   
-    @IBAction func goBack(sender: UIButton) {
-	// Go back to compact view when the user presses the back button
-        self.willTransition(to: MSMessagesAppPresentationStyle.compact))
+    
+    
+    // UITouch Functions
+    
+    func drawLine(from fromPoint: CGPoint, to toPoint: CGPoint) {
+        UIGraphicsBeginImageContext(view.frame.size)
+        guard let context = UIGraphicsGetCurrentContext() else {
+            return
+        }
+        
+        // add lines to that view
+        TempImageView.image?.draw(in: view.bounds)
+        context.move(to: fromPoint)
+        context.addLine(to: toPoint)
+        context.setLineCap(.round)
+        context.setBlendMode(.normal)
+        context.setLineWidth(brushWidth)
+        context.setStrokeColor(color.cgColor)
+        context.strokePath()
+        TempImageView.image = UIGraphicsGetImageFromCurrentImageContext()
+        TempImageView.alpha = opacity
+        UIGraphicsEndImageContext()
+        
     }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            // if this isn't the first touch, then we shouldn't be calling the touchesBegan method, so return
+            return
+        }
+        
+        swiped = false
+        lastPoint = touch.location(in: view)
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        
+        swiped = true
+        let currentPoint = touch.location(in: view)
+        drawLine(from: lastPoint, to: currentPoint)
+        
+        lastPoint = currentPoint
+        
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if !swiped { // if nothing was swiped, then just a single point was drawn
+            drawLine(from: lastPoint, to: lastPoint)
+        }
+        
+        UIGraphicsBeginImageContext(MainImageView.frame.size)
+        MainImageView.image?.draw(in: view.bounds, blendMode: .normal, alpha: 1.0)
+        TempImageView?.image?.draw(in: view.bounds, blendMode: .normal, alpha: opacity)
+        MainImageView.image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        
+        TempImageView.image = nil
+        
+    }
+    
+    
+    // Buttons Functions
+   
+    @IBAction func goBack(_ sender: UIButton) {
+        // Go back to compact view when the user presses the back button
+        self.willTransition(to: MSMessagesAppPresentationStyle.compact)
+    }
+       
+    
+    
 
 }

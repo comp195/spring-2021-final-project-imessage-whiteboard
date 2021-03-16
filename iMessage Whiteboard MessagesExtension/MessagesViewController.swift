@@ -8,16 +8,21 @@
 
 import UIKit
 import Messages
+import Network
 
 class MessagesViewController: MSMessagesAppViewController {
+    
+    // the variables needed for drawing
     var lastPoint = CGPoint.zero
     var color = UIColor.black
     var brushWidth: CGFloat = 10.0
     var opacity: CGFloat = 1.0
     var swiped = false
     
-    /* the above is code I'm using from a tutorial at https://www.raywenderlich.com/5895-uikit-drawing-tutorial-how-to-make-a-simple-drawing-app */
+    // the variables needed for a network connection from client(s) to server
+    let connection = networkConnection()
     
+    // the references to the Image Views in the storyboard
     @IBOutlet weak var TempImageView: UIImageView!
     @IBOutlet weak var MainImageView: UIImageView!
     
@@ -27,12 +32,11 @@ class MessagesViewController: MSMessagesAppViewController {
 
         // Do any additional setup after loading the view.
         self.willTransition(to: MSMessagesAppPresentationStyle.expanded)
+        
         // establish the port connection here
-        // to do: how to find the ip address of the other user so we can establish the port connection?
-        // var _: InputStream!
-        // var outputStream: OutputStream!
+        connection.setUpCommunication()
 
-        // put the user in drawing mode automatically?
+        // put the user in drawing mode automatically
     }
     
     // MARK: - Conversation Handling
@@ -85,6 +89,7 @@ class MessagesViewController: MSMessagesAppViewController {
     
     
     // UITouch Functions
+    /* the below is code I'm using from a tutorial at https://www.raywenderlich.com/5895-uikit-drawing-tutorial-how-to-make-a-simple-drawing-app */
     
     func drawLine(from fromPoint: CGPoint, to toPoint: CGPoint) {
         UIGraphicsBeginImageContext(view.frame.size)
@@ -143,11 +148,12 @@ class MessagesViewController: MSMessagesAppViewController {
         
         TempImageView.image = nil
         
+        // Send the input to the other device(s) in this iMessage session
+        
     }
     
     
     // Buttons Functions
-   
     @IBAction func goBack(_ sender: UIButton) {
         // Go back to compact view when the user presses the back button
         self.willTransition(to: MSMessagesAppPresentationStyle.compact)

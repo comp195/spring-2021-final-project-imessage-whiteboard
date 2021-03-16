@@ -14,6 +14,8 @@
 		9A7C4EB525C6341F00E3D3A5 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A7C4EB325C6341F00E3D3A5 /* MainInterface.storyboard */; };
 		9A7C4EB725C6342000E3D3A5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A7C4EB625C6342000E3D3A5 /* Assets.xcassets */; };
 		9A7C4EC925E1D48D00E3D3A5 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A7C4EB325C6341F00E3D3A5 /* MainInterface.storyboard */; };
+		9AEB50582600717200A0F5A2 /* Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB50572600717200A0F5A2 /* Messages.swift */; };
+		9AEB505C2600794E00A0F5A2 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB505B2600794E00A0F5A2 /* Network.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +52,8 @@
 		9A7C4EB425C6341F00E3D3A5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
 		9A7C4EB625C6342000E3D3A5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9A7C4EB825C6342000E3D3A5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		9AEB50572600717200A0F5A2 /* Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messages.swift; sourceTree = "<group>"; };
+		9AEB505B2600794E00A0F5A2 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +71,8 @@
 		9A7C4E9825C6341B00E3D3A5 = {
 			isa = PBXGroup;
 			children = (
+				9AEB505B2600794E00A0F5A2 /* Network.swift */,
+				9AEB50572600717200A0F5A2 /* Messages.swift */,
 				9A7C4EA125C6341B00E3D3A5 /* iMessage Whiteboard */,
 				9A7C4EB025C6341F00E3D3A5 /* iMessage Whiteboard MessagesExtension */,
 				9A7C4EAD25C6341F00E3D3A5 /* Frameworks */,
@@ -127,6 +133,8 @@
 				9A7C4EAC25C6341F00E3D3A5 /* PBXTargetDependency */,
 			);
 			name = "iMessage Whiteboard";
+			packageProductDependencies = (
+			);
 			productName = "iMessage Whiteboard";
 			productReference = 9A7C4E9F25C6341B00E3D3A5 /* iMessage Whiteboard.app */;
 			productType = "com.apple.product-type.application.messages";
@@ -144,6 +152,8 @@
 			dependencies = (
 			);
 			name = "iMessage Whiteboard MessagesExtension";
+			packageProductDependencies = (
+			);
 			productName = "iMessage Whiteboard MessagesExtension";
 			productReference = 9A7C4EA925C6341F00E3D3A5 /* iMessage Whiteboard MessagesExtension.appex */;
 			productType = "com.apple.product-type.app-extension.messages";
@@ -174,6 +184,8 @@
 				Base,
 			);
 			mainGroup = 9A7C4E9825C6341B00E3D3A5;
+			packageReferences = (
+			);
 			productRefGroup = 9A7C4EA025C6341B00E3D3A5 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -211,6 +223,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A7C4EB225C6341F00E3D3A5 /* MessagesViewController.swift in Sources */,
+				9AEB50582600717200A0F5A2 /* Messages.swift in Sources */,
+				9AEB505C2600794E00A0F5A2 /* Network.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

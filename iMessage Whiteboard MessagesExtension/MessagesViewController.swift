@@ -18,6 +18,7 @@ class MessagesViewController: MSMessagesAppViewController {
     var brushWidth: CGFloat = 10.0
     var opacity: CGFloat = 1.0
     var swiped = false
+    var typing = false
     
     // the variables needed for a network connection from client(s) to server
     let connection = networkConnection()
@@ -97,6 +98,11 @@ class MessagesViewController: MSMessagesAppViewController {
             return
         }
         
+        if typing { // don't draw while they're typing, they probably meant for their swipe to be moving a text box, not drawing a line
+            // they need to go back into drawing mode by pressing the squiggly button before they can draw more lines
+            return
+        }
+        
         // add lines to that view
         TempImageView.image?.draw(in: view.bounds)
         context.move(to: fromPoint)
@@ -136,6 +142,9 @@ class MessagesViewController: MSMessagesAppViewController {
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if typing {
+            return
+        }
         if !swiped { // if nothing was swiped, then just a single point was drawn
             drawLine(from: lastPoint, to: lastPoint)
         }
@@ -158,8 +167,45 @@ class MessagesViewController: MSMessagesAppViewController {
         // Go back to compact view when the user presses the back button
         self.willTransition(to: MSMessagesAppPresentationStyle.compact)
     }
-       
     
+    @objc func moveTextBox(_ gesture: UIPanGestureRecognizer){
+        let translation = gesture.translation(in: view) // get the amount moved
+        
+        guard let g = gesture.view else {
+            return
+        }
+        
+        g.center = CGPoint(x: g.center.x + translation.x,
+                           y: g.center.y + translation.y) // move that amount
+        
+        // set the amount moved to 0 for next time
+        gesture.setTranslation(.zero, in: view)
+    }
     
-
+    @IBAction func goToTextMode(_ sender: UIButton) {
+        // take them out of drawing mode and into typing mode
+        typing = true
+        
+        // make a text box
+        let myTextBox = UITextField(frame: CGRect(x:100, y:100, width:500, height:40))
+        myTextBox.placeholder = "Start typing here!"
+        myTextBox.font = UIFont.systemFont(ofSize: 15)
+        myTextBox.autocorrectionType = UITextAutocorrectionType.yes
+        myTextBox.keyboardType = UIKeyboardType.default
+        myTextBox.returnKeyType = UIReturnKeyType.done
+        myTextBox.clearButtonMode = UITextField.ViewMode.always
+        
+        // make a gesture recognizer to let users move the box
+        let pan = UIPanGestureRecognizer(target: self, action: #selector(moveTextBox(_ :)))
+        myTextBox.isUserInteractionEnabled = true
+        myTextBox.addGestureRecognizer(pan)
+        
+        self.view.addSubview(myTextBox)
+        
+        
+    }
+    
+    @IBAction func goToDrawingMode(_ sender: UIButton) {
+        typing = false
+    }
 }

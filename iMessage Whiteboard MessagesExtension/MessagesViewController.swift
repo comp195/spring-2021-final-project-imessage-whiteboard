@@ -23,9 +23,10 @@ class MessagesViewController: MSMessagesAppViewController {
     // the variables needed for a network connection from client(s) to server
     let connection = networkConnection()
     
-    // the references to the Image Views in the storyboard
+    // the references to the Image Views, Labels, etc. in the storyboard
     @IBOutlet weak var TempImageView: UIImageView!
     @IBOutlet weak var MainImageView: UIImageView!
+    @IBOutlet weak var tempTextBoxLabel: UILabel!
     
     // Messages functions
     override func viewDidLoad() {
@@ -90,7 +91,7 @@ class MessagesViewController: MSMessagesAppViewController {
     
     
     // UITouch Functions
-    /* the below is code I'm using from a tutorial at https://www.raywenderlich.com/5895-uikit-drawing-tutorial-how-to-make-a-simple-drawing-app */
+    /* some of the below is code I'm using from a tutorial at https://www.raywenderlich.com/5895-uikit-drawing-tutorial-how-to-make-a-simple-drawing-app */
     
     func drawLine(from fromPoint: CGPoint, to toPoint: CGPoint) {
         UIGraphicsBeginImageContext(view.frame.size)
@@ -98,7 +99,8 @@ class MessagesViewController: MSMessagesAppViewController {
             return
         }
         
-        if typing { // don't draw while they're typing, they probably meant for their swipe to be moving a text box, not drawing a line
+        if typing {
+            // don't draw while they're typing, they probably meant for their swipe to be moving a text box, not drawing a line
             // they need to go back into drawing mode by pressing the squiggly button before they can draw more lines
             return
         }
@@ -161,12 +163,8 @@ class MessagesViewController: MSMessagesAppViewController {
         
     }
     
-    
-    // Buttons Functions
-    @IBAction func goBack(_ sender: UIButton) {
-        // Go back to compact view when the user presses the back button
-        self.willTransition(to: MSMessagesAppPresentationStyle.compact)
-    }
+
+    // Button functions
     
     @objc func moveTextBox(_ gesture: UIPanGestureRecognizer){
         let translation = gesture.translation(in: view) // get the amount moved
@@ -182,26 +180,40 @@ class MessagesViewController: MSMessagesAppViewController {
         gesture.setTranslation(.zero, in: view)
     }
     
-    @IBAction func goToTextMode(_ sender: UIButton) {
-        // take them out of drawing mode and into typing mode
-        typing = true
+    @objc func makeTextBox(_ gesture: UITapGestureRecognizer) {
+        tempTextBoxLabel.isHidden = true
         
         // make a text box
-        let myTextBox = UITextField(frame: CGRect(x:100, y:100, width:500, height:40))
-        myTextBox.placeholder = "Start typing here!"
+        let myTextBox = UITextField(frame: CGRect(x:10, y:100, width:view.frame.width/2, height:40))
+        myTextBox.borderStyle = UITextField.BorderStyle.line
+        myTextBox.text = "Start typing here!"
         myTextBox.font = UIFont.systemFont(ofSize: 15)
         myTextBox.autocorrectionType = UITextAutocorrectionType.yes
-        myTextBox.keyboardType = UIKeyboardType.default
+        myTextBox.keyboardType = UIKeyboardType.alphabet
         myTextBox.returnKeyType = UIReturnKeyType.done
         myTextBox.clearButtonMode = UITextField.ViewMode.always
+        self.view.addSubview(myTextBox)
         
         // make a gesture recognizer to let users move the box
         let pan = UIPanGestureRecognizer(target: self, action: #selector(moveTextBox(_ :)))
         myTextBox.isUserInteractionEnabled = true
         myTextBox.addGestureRecognizer(pan)
         
-        self.view.addSubview(myTextBox)
+        // remove the tap gesture recognizer we assigned in goToTextMode()
+        self.view.removeGestureRecognizer(gesture)
+    }
+    
+    
+    @IBAction func goToTextMode(_ sender: UIButton) {
+        // take them out of drawing mode and into typing mode
+        typing = true
         
+        // tell them to point to where they want the text box to land
+        tempTextBoxLabel.isHidden = false
+        
+        // wait for them to click
+        let tap = UITapGestureRecognizer(target: self, action: #selector(makeTextBox(_:)))
+        self.view.addGestureRecognizer(tap)
         
     }
     

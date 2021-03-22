@@ -11,4 +11,4 @@ iMessage Whiteboard is an in-app iMessage extension for real-time collaboration 
 This project consists of client-side code written in Swift and a small Python server that saves history.
 
 ## Special Notes:
-At the project's current state, only a basic UI is up and running on the client side and a server has been written in Python. The next step is to set up client side communication to this server by using sockets.
+As of March 21, the project's client side code allows users to draw lines and make text boxes, but doesn't yet send those to the server. The networking is set up on the server side, but not actually utilized yet. Also, the updated project plan shows that some elements have been labeled as "stretch goals" or moved to later dates to accommodate for some earlier goals that took longer than expected.

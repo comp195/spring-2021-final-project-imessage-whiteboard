@@ -33,8 +33,9 @@ def send_changes_to_users(s, addr_tuple):
 		s.sendto(message, i)
 
 def listen(conn, addr):
+	print("Created a new thread for user at " + str(addr))
 	while 1:
-		data, addr = conn.recvfrom(1024)
+		data, addr = conn.recvfrom(4096)
 		print("I received a message from " + str(addr))
 		if addr in users:
 			print("The message is " + str(data))
@@ -79,6 +80,7 @@ def serve():
 
 
 if __name__ == '__main__':
+	print("starting server")
 	serve()
 
 

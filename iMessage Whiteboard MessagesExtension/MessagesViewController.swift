@@ -149,6 +149,8 @@ class MessagesViewController: MSMessagesAppViewController {
         }
         if !swiped { // if nothing was swiped, then just a single point was drawn
             drawLine(from: lastPoint, to: lastPoint)
+            let dummyMessage = "I drew a dot".data(using: .utf8)!
+            connection.sendDataToServer(message: dummyMessage)
         }
         
         UIGraphicsBeginImageContext(MainImageView.frame.size)
@@ -160,6 +162,9 @@ class MessagesViewController: MSMessagesAppViewController {
         TempImageView.image = nil
         
         // Send the input to the other device(s) in this iMessage session
+        
+        let dummyMessage = "I drew a line".data(using: .utf8)!
+        connection.sendDataToServer(message: dummyMessage)
         
     }
     

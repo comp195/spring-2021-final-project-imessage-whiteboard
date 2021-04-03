@@ -9,7 +9,7 @@ import Foundation
 
 
 // globals
-let server = URL(string: "localhost:9000")
+let server = URL(string: "54.243.90.219:9998")
 var usersArray: [String: Int]! // dictionary of IP address as a string and port num as int
 
 // networking class
@@ -25,7 +25,7 @@ class networkConnection: NSObject {
         var writeStream: Unmanaged<CFWriteStream>?
         
         // set up the network connection
-        CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, "localhost" as CFString, 9000, &readStream, &writeStream)
+        CFStreamCreatePairWithSocketToHost(kCFAllocatorDefault, "54.243.90.219" as CFString, 9998, &readStream, &writeStream)
         
         // init the streams while preventing memory leak
         inputStream = readStream!.takeRetainedValue()
@@ -43,6 +43,24 @@ class networkConnection: NSObject {
         outputStream.open()
     }
     
+    // write to server
+    func sendDataToServer(message: Data)
+    {
+        // Apply the withUnsafeBytes closure to the dummyMessage string I wrote
+        message.withUnsafeBytes {
+            // make a pointer from the dummyMessage string
+            guard let pointer = $0.baseAddress?.assumingMemoryBound(to: UInt8.self) else {
+                print("Error sending message to server")
+                return
+            }
+            
+            // send the message to the server
+            outputStream.write(pointer, maxLength: message.count)
+        }
+    }
+    
+    
+    
 }
 
 extension networkConnection: StreamDelegate {
@@ -58,10 +76,12 @@ extension networkConnection: StreamDelegate {
         case .hasSpaceAvailable:
             print("The message was short")
         default:
-            print("What the fuck happened")
+            print("What the fuck happened: \(eventCode)")
         }
     }
     
+    
+    // read from server
     private func readBytes(stream: InputStream) {
         let buff = UnsafeMutablePointer<UInt8>.allocate(capacity: maxReadLength)
         
@@ -95,4 +115,7 @@ extension networkConnection: StreamDelegate {
         return Messages(senderIP: addr, senderPort: 0, messageContents: message)
         
     }
+    
+    
+    
 }

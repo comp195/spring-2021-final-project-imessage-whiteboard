@@ -34,9 +34,13 @@ class MessagesViewController: MSMessagesAppViewController {
 
         // Do any additional setup after loading the view.
         self.willTransition(to: MSMessagesAppPresentationStyle.expanded)
+
         
         // establish the port connection here
         connection.setUpCommunication()
+        
+        let dummyMessage = "Hello!!".data(using: .utf8)!
+        connection.sendDataToServer(message: dummyMessage)
 
         // put the user in drawing mode automatically
     }
@@ -149,8 +153,6 @@ class MessagesViewController: MSMessagesAppViewController {
         }
         if !swiped { // if nothing was swiped, then just a single point was drawn
             drawLine(from: lastPoint, to: lastPoint)
-            let dummyMessage = "I drew a dot".data(using: .utf8)!
-            connection.sendDataToServer(message: dummyMessage)
         }
         
         UIGraphicsBeginImageContext(MainImageView.frame.size)
@@ -168,6 +170,22 @@ class MessagesViewController: MSMessagesAppViewController {
         
     }
     
+    /*
+     func drawUpdatesFromOtherClients( ){
+        // should take a bytearray that can be deserialized into a Set<UITouches> object
+     
+        // signal the touchesEnded event
+     }
+     */
+    
+    /*
+     func addTextUpdatesFromOtherClients( ){
+        // should take a bytearray that can be deserialized into a UITextField object
+        // should also take an arg that specifies whether we're calling the makeTextBox or moveTextBox function
+        // signal the makeTextBox function or the moveTextBox function
+     }
+     */
+    
 
     // Button functions
     
@@ -183,6 +201,10 @@ class MessagesViewController: MSMessagesAppViewController {
         
         // set the amount moved to 0 for next time
         gesture.setTranslation(.zero, in: view)
+        
+        // notify the server
+        let dummyMessage = "I moved a text box horizontally \(translation.x) pixels and vertically \(translation.y) pixels".data(using: .utf8)!
+        connection.sendDataToServer(message: dummyMessage)
     }
     
     @objc func makeTextBox(_ gesture: UITapGestureRecognizer) {
@@ -206,6 +228,10 @@ class MessagesViewController: MSMessagesAppViewController {
         
         // remove the tap gesture recognizer we assigned in goToTextMode()
         self.view.removeGestureRecognizer(gesture)
+        
+        // notify the server
+        let dummyMessage = "I made a text box".data(using: .utf8)!
+        connection.sendDataToServer(message: dummyMessage)
     }
     
     

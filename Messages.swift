@@ -8,7 +8,13 @@
 import Foundation
 
 struct Messages {
-    var senderIP: String
-    var senderPort: Int
+    var senderIP: CFString
+    var senderPort: Int8
     var messageContents: String
+    
+    init(message: String, ip:CFString, port:Int8){
+        self.senderIP = ip
+        self.senderPort = port
+        self.messageContents = message
+    }
 }

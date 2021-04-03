@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 
 // globals
@@ -55,12 +56,11 @@ class networkConnection: NSObject {
             }
             
             // send the message to the server
+            print("writing to server")
             outputStream.write(pointer, maxLength: message.count)
         }
     }
-    
-    
-    
+
 }
 
 extension networkConnection: StreamDelegate {
@@ -75,6 +75,8 @@ extension networkConnection: StreamDelegate {
             print("Something horrible has happened. Give up.")
         case .hasSpaceAvailable:
             print("The message was short")
+        case .openCompleted:
+            print("The connection opened")
         default:
             print("What the fuck happened: \(eventCode)")
         }
@@ -96,7 +98,9 @@ extension networkConnection: StreamDelegate {
             if let message = processedMessageString(buff: buff, length: numBytesRead)
             {
                 // tell people we got a message here
+                //delegate?.received(message: message)
                 print("We've got mail")
+                print(message)
             }
         }
     }
@@ -111,11 +115,10 @@ extension networkConnection: StreamDelegate {
         else {
             return nil
         }
-        
-        return Messages(senderIP: addr, senderPort: 0, messageContents: message)
+        let m = Messages(message: message, ip: addr as CFString, port: 100) // idk the port number, fix it later
+        return m
         
     }
     
-    
-    
 }
+

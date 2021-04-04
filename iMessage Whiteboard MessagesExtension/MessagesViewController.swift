@@ -10,7 +10,7 @@ import UIKit
 import Messages
 import Network
 
-class MessagesViewController: MSMessagesAppViewController {
+class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
     
     // the variables needed for drawing
     var lastPoint = CGPoint.zero
@@ -22,6 +22,9 @@ class MessagesViewController: MSMessagesAppViewController {
     
     // the variables needed for a network connection from client(s) to server
     let connection = networkConnection()
+    
+    // delegate
+    var delegate:MessagesDelegator?
     
     // the references to the Image Views, Labels, etc. in the storyboard
     @IBOutlet weak var TempImageView: UIImageView!
@@ -35,9 +38,11 @@ class MessagesViewController: MSMessagesAppViewController {
         // Do any additional setup after loading the view.
         self.willTransition(to: MSMessagesAppPresentationStyle.expanded)
 
-        
         // establish the port connection here
         connection.setUpCommunication()
+        
+        // set up the delegate
+        connection.delegate = self
         
         let dummyMessage = "Hello!!".data(using: .utf8)!
         connection.sendDataToServer(message: dummyMessage)
@@ -185,6 +190,16 @@ class MessagesViewController: MSMessagesAppViewController {
         // signal the makeTextBox function or the moveTextBox function
      }
      */
+    
+    
+    // Delegate functions
+    
+    func printToScreen(m: String) {
+        let text = UITextField(frame: CGRect(x:20, y:20, width: 300, height:100))
+        text.placeholder = m
+        self.view.addSubview(text)
+        
+    }
     
 
     // Button functions

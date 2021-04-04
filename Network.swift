@@ -21,6 +21,9 @@ class networkConnection: NSObject {
     // have to have both input and output streams to make a bidirectional communication channel
     let maxReadLength = 4096
     
+    // delegate so that we can signal the MessagesViewController from within this file
+    var delegate: MessagesDelegator?
+    
     func setUpCommunication() {
         var readStream: Unmanaged<CFReadStream>?
         var writeStream: Unmanaged<CFWriteStream>?
@@ -99,8 +102,11 @@ extension networkConnection: StreamDelegate {
             {
                 // tell people we got a message here
                 //delegate?.received(message: message)
-                print("We've got mail")
-                print(message)
+                print("We've got mail from \(message.senderIP)")
+                print(message.messageContents)
+                
+                // for now, print the message on the screen so I can see it even when a debugger isn't attached
+                delegate?.printToScreen(m: message.messageContents)
             }
         }
     }
@@ -115,7 +121,8 @@ extension networkConnection: StreamDelegate {
         else {
             return nil
         }
-        let m = Messages(message: message, ip: addr as CFString, port: 100) // idk the port number, fix it later
+        let m = Messages(message: message, ip: addr as CFString, port: -1) // idk the port number, but it probably doesn't matter
+            // maybe fix it later
         return m
         
     }

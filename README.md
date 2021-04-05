@@ -11,4 +11,4 @@ iMessage Whiteboard is an in-app iMessage extension for real-time collaboration 
 This project consists of client-side code written in Swift and a small Python server that saves history.
 
 ## Special Notes:
-As of March 21, the project's client side code allows users to draw lines and make text boxes, but doesn't yet send those to the server. The networking is set up on the server side, but not actually utilized yet. Also, the updated project plan shows that some elements have been labeled as "stretch goals" or moved to later dates to accommodate for some earlier goals that took longer than expected.
+As of April 4, the project's client side code allows users to draw lines and make text boxes, and sends textual updates of the client's activities to the server. I am attempting to use MSSessions to send data, which means using the iMessage session to send and receive data instead of making my own networking setup. I also have my own networking setup ready, but I don't think that it's working as well as the builtin MSSessions library. 

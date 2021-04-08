@@ -10,5 +10,7 @@ import UIKit
 
 protocol MessagesDelegator {
     func printToScreen(m: String)
-
+    func receivedMoveTextBox(m: String)
+    func receivedAddTextBox(m: String)
+    func receivedDrawLine(m: String)
 }

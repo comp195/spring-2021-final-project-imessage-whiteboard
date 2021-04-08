@@ -102,29 +102,48 @@ extension networkConnection: StreamDelegate {
             {
                 // tell people we got a message here
                 //delegate?.received(message: message)
-                print("We've got mail from \(message.senderIP)")
-                print(message.messageContents)
+                print("We've got mail ")
+                print(message)
+                
+                var m = message
+                if(m.count == 0)
+                {
+                    return
+                }
+                
+                // get first char, which tells us which function to send this message to
+                let firstChar = m.prefix(1)
+                
+                // trim that first char off the string, we won't need it again
+                m.remove(at: m.startIndex)
+                
+                // send the message to the client
+                switch firstChar {
+                case "1":
+                    delegate?.receivedDrawLine(m: m)
+                case "2":
+                    delegate?.receivedAddTextBox(m: m)
+                case "3":
+                    delegate?.receivedMoveTextBox(m: m)
+                default:
+                    print("Bad error, couldn't give message back to client")
+                }
                 
                 // for now, print the message on the screen so I can see it even when a debugger isn't attached
-                delegate?.printToScreen(m: message.messageContents)
+                //delegate?.printToScreen(m: message.messageContents)
             }
         }
     }
     
-    private func processedMessageString(buff: UnsafeMutablePointer<UInt8>, length: Int) -> Messages? {
+    private func processedMessageString(buff: UnsafeMutablePointer<UInt8>, length: Int) -> String? {
         guard
-            let stringArray = String(
-                bytesNoCopy: buff, length: length, encoding: .utf8, freeWhenDone: true)?.components(separatedBy: ","),
+            let message = String(
+                bytesNoCopy: buff, length: length, encoding: .utf8, freeWhenDone: true)
             // format is as follows [ip: message]
-            let addr = stringArray.first,
-            let message = stringArray.last
         else {
             return nil
         }
-        let m = Messages(message: message, ip: addr as CFString, port: -1) // idk the port number, but it probably doesn't matter
-            // maybe fix it later
-        return m
-        
+        return message
     }
     
 }

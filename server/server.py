@@ -16,22 +16,27 @@ users_ips_ports = dict()
 # global hash of (ip, port):thread
 addr_thread_hash = dict()
 
+# global hash of ip:socket
+socket_hash = dict()
+
 #def export(addr_tuple):
 	# make a pdf
 	# send it to them in an email? iMessage? get their permission to put it in their iOS file system on the device?
 
-def send_changes_to_users(s, addr_tuple, message):
+def send_changes_to_user(addr_tuple, message):
     if len(addr_tuple) != 2:
         raise RuntimeError
 
+    ip = addr_tuple[0]
     print("I'm sending changes to these users: ")
-    for i in users_ip:
-        if i == addr_tuple:
+    for i in users_ips:
+        if i == ip:
             continue
 
-        addr = (ip, users_ips_ports[i])
-        s.sendto(message, i)
-        print(str(i))
+        print(i)
+        addr = (i, users_ips_ports[i])
+        s = socket_hash[i]
+        s.sendto(message, addr)
 
 def listen(conn, addr):
     global global_data
@@ -42,7 +47,7 @@ def listen(conn, addr):
 
         if data:
             print("I received a message from " + str(addr))
-            if addr in users_ip_ports.get_items():
+            if addr in users_ips_ports.items():
                 print("The message is " + str(data))
 
                 if data == b'LEAVE':
@@ -51,13 +56,16 @@ def listen(conn, addr):
                         print("This user is leaving")
                         thread_id = addr_thread_hash[addr]
                         del(addr_thread_hash[addr])
+                        users_ips.remove(addr[0])
+                        del(users_ips_ports[addr[0]])
+                        del(socket_hash[addr[0]])
                         sys.exit() # use this to join the thread from within the thread
                     except KeyError:
                         print("Couldn't find the user who was trying to leave the session")	
                         continue
                         
                 global_data.append(data)
-                send_changes_to_users(conn, addr, data)
+                send_changes_to_user(addr, data)
     
 
 def serve():
@@ -65,6 +73,7 @@ def serve():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     my_ip = ''
     my_port = 9998
+    s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind((my_ip, my_port))
 
     # for now, only allow 2 users to connect at a time
@@ -74,15 +83,20 @@ def serve():
         conn, addr = s.accept()
 
         # add the new user to the set of users
-        users_ip.add(addr[0])
+        users_ips.add(addr[0])
         users_ips_ports[addr[0]] = addr[1]
         print("Adding a new user\n")
 
         # make a new thread for this user
         new_thread = threading.Thread(target=listen, args=(conn, addr,))
+        socket_hash[addr[0]] = conn
         addr_thread_hash[addr] = new_thread
     
         new_thread.start()
+
+        if len(addr_thread_hash) == 0:
+            break
+
     s.close()
 
 

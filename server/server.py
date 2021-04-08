@@ -10,7 +10,8 @@ import threading
 global_data = list()
 
 # global list of users' info, stored in tuples like this: (user_ip, port)
-users = set()
+users_ips = set()
+users_ips_ports = dict()
 
 # global hash of (ip, port):thread
 addr_thread_hash = dict()
@@ -19,27 +20,29 @@ addr_thread_hash = dict()
 	# make a pdf
 	# send it to them in an email? iMessage? get their permission to put it in their iOS file system on the device?
 
-def send_changes_to_users(s, addr_tuple):
+def send_changes_to_users(s, addr_tuple, message):
     if len(addr_tuple) != 2:
         raise RuntimeError
 
-    # server sends changes to all other clients
-    message = b'Message to update stuff'
-
-    # below I'm sending a string, but we will really be sending the data from the global_data list
-    for i in users:
+    print("I'm sending changes to these users: ")
+    for i in users_ip:
         if i == addr_tuple:
             continue
+
+        addr = (ip, users_ips_ports[i])
         s.sendto(message, i)
+        print(str(i))
 
 def listen(conn, addr):
+    global global_data
+
     print("Created a new thread for user at " + str(addr))
     while 1:
         data = conn.recv(4096)
 
         if data:
             print("I received a message from " + str(addr))
-            if addr in users:
+            if addr in users_ip_ports.get_items():
                 print("The message is " + str(data))
 
                 if data == b'LEAVE':
@@ -54,7 +57,7 @@ def listen(conn, addr):
                         continue
                         
                 global_data.append(data)
-                send_changes_to_users(conn, addr)
+                send_changes_to_users(conn, addr, data)
     
 
 def serve():
@@ -71,7 +74,8 @@ def serve():
         conn, addr = s.accept()
 
         # add the new user to the set of users
-        users.add(addr)
+        users_ip.add(addr[0])
+        users_ips_ports[addr[0]] = addr[1]
         print("Adding a new user\n")
 
         # make a new thread for this user

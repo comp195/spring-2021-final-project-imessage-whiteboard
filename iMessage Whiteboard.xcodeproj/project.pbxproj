@@ -16,6 +16,7 @@
 		9A7C4EC925E1D48D00E3D3A5 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9A7C4EB325C6341F00E3D3A5 /* MainInterface.storyboard */; };
 		9AEB50582600717200A0F5A2 /* Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB50572600717200A0F5A2 /* Messages.swift */; };
 		9AEB505C2600794E00A0F5A2 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB505B2600794E00A0F5A2 /* Network.swift */; };
+		9AEB5085261972A500A0F5A2 /* MessagesDelegator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB5084261972A500A0F5A2 /* MessagesDelegator.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -54,6 +55,8 @@
 		9A7C4EB825C6342000E3D3A5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9AEB50572600717200A0F5A2 /* Messages.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Messages.swift; sourceTree = "<group>"; };
 		9AEB505B2600794E00A0F5A2 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
+		9AEB5083261972A500A0F5A2 /* iMessage Whiteboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iMessage Whiteboard-Bridging-Header.h"; sourceTree = "<group>"; };
+		9AEB5084261972A500A0F5A2 /* MessagesDelegator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesDelegator.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,11 +75,13 @@
 			isa = PBXGroup;
 			children = (
 				9AEB505B2600794E00A0F5A2 /* Network.swift */,
+				9AEB5084261972A500A0F5A2 /* MessagesDelegator.swift */,
 				9AEB50572600717200A0F5A2 /* Messages.swift */,
 				9A7C4EA125C6341B00E3D3A5 /* iMessage Whiteboard */,
 				9A7C4EB025C6341F00E3D3A5 /* iMessage Whiteboard MessagesExtension */,
 				9A7C4EAD25C6341F00E3D3A5 /* Frameworks */,
 				9A7C4EA025C6341B00E3D3A5 /* Products */,
+				9AEB5083261972A500A0F5A2 /* iMessage Whiteboard-Bridging-Header.h */,
 			);
 			sourceTree = "<group>";
 		};
@@ -169,6 +174,7 @@
 				TargetAttributes = {
 					9A7C4E9E25C6341B00E3D3A5 = {
 						CreatedOnToolsVersion = 12.4;
+						LastSwiftMigration = 1240;
 					};
 					9A7C4EA825C6341F00E3D3A5 = {
 						CreatedOnToolsVersion = 12.4;
@@ -223,6 +229,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				9A7C4EB225C6341F00E3D3A5 /* MessagesViewController.swift in Sources */,
+				9AEB5085261972A500A0F5A2 /* MessagesDelegator.swift in Sources */,
 				9AEB50582600717200A0F5A2 /* Messages.swift in Sources */,
 				9AEB505C2600794E00A0F5A2 /* Network.swift in Sources */,
 			);
@@ -373,6 +380,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = V64Z66BW8X;
 				INFOPLIST_FILE = "iMessage Whiteboard MessagesExtension/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -393,6 +401,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = V64Z66BW8X;
 				INFOPLIST_FILE = "iMessage Whiteboard MessagesExtension/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -411,11 +420,20 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = V64Z66BW8X;
 				INFOPLIST_FILE = "iMessage Whiteboard/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.iMessage-Whiteboard";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "iMessage Whiteboard-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -426,11 +444,19 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = V64Z66BW8X;
 				INFOPLIST_FILE = "iMessage Whiteboard/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.example.iMessage-Whiteboard";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "iMessage Whiteboard-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -8,6 +8,15 @@
 import Foundation
 import UIKit
 
+// enum for types of server messages received
+enum ServerMessageType: Int {
+    case drawLineBeganString = 0
+    case drawLineMovedString = 1
+    case drawLineEndedString = 2
+    case addTextBoxString = 3
+    case movedTextBoxString = 4
+}
+
 
 // globals
 let server = URL(string: "54.243.90.219:9998")
@@ -102,8 +111,8 @@ extension networkConnection: StreamDelegate {
             {
                 // tell people we got a message here
                 //delegate?.received(message: message)
-                print("We've got mail ")
-                print(message)
+                //print("We've got mail ")
+                //print(message)
                 
                 var m = message
                 if(m.count == 0)
@@ -119,12 +128,17 @@ extension networkConnection: StreamDelegate {
                 
                 // send the message to the client
                 switch firstChar {
-                case "1":
-                    delegate?.receivedDrawLine(m: m)
-                case "2":
+                case "\(ServerMessageType.addTextBoxString.rawValue)":
                     delegate?.receivedAddTextBox(m: m)
-                case "3":
+                case "\(ServerMessageType.movedTextBoxString.rawValue)":
                     delegate?.receivedMoveTextBox(m: m)
+                case "\(ServerMessageType.drawLineBeganString.rawValue)":
+                    delegate?.receivedTouchesBegan(m: m)
+                case "\(ServerMessageType.drawLineMovedString.rawValue)":
+                    delegate?.receivedTouchesMoved(m: m)
+                case "\(ServerMessageType.drawLineEndedString.rawValue)":
+                    delegate?.receivedTouchesEnded(m: m)
+                    
                 default:
                     print("Bad error, couldn't give message back to client")
                 }

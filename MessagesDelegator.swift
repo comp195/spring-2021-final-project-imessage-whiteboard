@@ -9,8 +9,10 @@ import Foundation
 import UIKit
 
 protocol MessagesDelegator {
-    func printToScreen(m: String)
     func receivedMoveTextBox(m: String)
     func receivedAddTextBox(m: String)
-    func receivedDrawLine(m: String)
+    func receivedTouchesBegan(m: String)
+    func receivedTouchesMoved(m: String)
+    func receivedTouchesEnded(m: String)
+
 }

@@ -10,26 +10,27 @@ import UIKit
 import Messages
 import Network
 
+
 class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
     
     // the variables needed for drawing
     var lastPoint = CGPoint.zero
+    var participantLastPoint = CGPoint.zero
     var color = UIColor.black
+    var participantColor = UIColor.black
     var brushWidth: CGFloat = 10.0
     var opacity: CGFloat = 1.0
     var swiped = false
+    var participantSwiped = false
     var typing = false
+    var participantTyping = false
     
     // the variables needed for a network connection from client(s) to server
     let connection = networkConnection()
     
-    // delegate and associated variables
+    // delegate
     var delegate:MessagesDelegator?
-    var sendToServerText = true
-    var sendToServerDraw = true
-    let drawLineString = "1"
-    let addTextBoxString = "2"
-    let movedTextBoxString = "3"
+
     
     // the references to the Image Views, Labels, etc. in the storyboard
     @IBOutlet weak var TempImageView: UIImageView!
@@ -170,12 +171,16 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard let touch = touches.first else {
-            // if this isn't the first touch, then we shouldn't be calling the touchesBegan method, so return
             return
         }
         
         swiped = false
         lastPoint = touch.location(in: view)
+        
+        // just send lastPoint
+        let message = "\(ServerMessageType.drawLineBeganString.rawValue)x\(lastPoint.x)y\(lastPoint.y)\n".data(using: .utf8)!
+        connection.sendDataToServer(message: message)
+        
     }
     
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -189,12 +194,17 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         
         lastPoint = currentPoint
         
+        // just send lastPoint
+        let message = "\(ServerMessageType.drawLineMovedString.rawValue)x\(lastPoint.x)y\(lastPoint.y)\n".data(using: .utf8)!
+        connection.sendDataToServer(message: message)
+        
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if typing {
             return
         }
+        
         if !swiped { // if nothing was swiped, then just a single point was drawn
             drawLine(from: lastPoint, to: lastPoint)
         }
@@ -204,13 +214,10 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         TempImageView?.image?.draw(in: view.bounds, blendMode: .normal, alpha: opacity)
         MainImageView.image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        
         TempImageView.image = nil
-        
-        // Send the input to the other device(s) in this iMessage session
-        
-        let dummyMessage = "I drew a line".data(using: .utf8)!
-        connection.sendDataToServer(message: dummyMessage)
+        // just send lastPoint
+        let message = "\(ServerMessageType.drawLineEndedString.rawValue)x\(lastPoint.x)y\(lastPoint.y)\n".data(using: .utf8)!
+        connection.sendDataToServer(message: message)
         
         // trigger the update function
         //updateConversationParticipants()
@@ -261,44 +268,42 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
     
     // Delegate functions and helpers
     
-    func parseMessage(m: String) -> CGPoint {
+    func parseMessage(m: String) -> CGPoint? {
         // at this point, messages should be in the format "x20y20" if they were moved 20 right and 20 up
         var message = m
         message.remove(at: message.startIndex) // remove the "x"
+        message = String(message.dropLast(2)) // remove the "\n"
         
         // make variables that represent the translation and put them in a CGPoint
         let parts = message.split(separator: "y")
-        let x = Float(parts[0])
-        let y = Float(parts[1])
-        var point = CGPoint()
-        point.x = CGFloat(x!)
-        point.y = CGFloat(y!)
+        if let x = Float(parts[0]), let y = Float(parts[1]){
+            var point = CGPoint()
+            point.x = CGFloat(x)
+            point.y = CGFloat(y)
+            return point
+        }
         
-        return point
-    }
-    
-    func printToScreen(m: String) {
-        let text = UITextField(frame: CGRect(x:20, y:20, width: 300, height:100))
-        text.placeholder = m
-        self.view.addSubview(text)
-        
+        return nil
     }
     
     func receivedMoveTextBox( m: String )
     {
         print("Will move text box")
         // parse m
-        let point = parseMessage(m: m)
+        if let point = parseMessage(m: m){
         
-        // make a gesture
-        let g = UIPanGestureRecognizer(target: self, action: #selector(moveTextBox(_ :)))
-        g.setTranslation(point, in: view)
+            // make a gesture
+            let g = UIPanGestureRecognizer(target: self, action: #selector(moveTextBox(_ :)))
+            g.setTranslation(point, in: view)
         
-        // attach that gesture to the textBox
+            // attach that gesture to the textBox
         
-        // call moveTextBox and don't send to the server
-        moveTextBox(g)
-        
+            // call moveTextBox and don't send to the server
+            moveTextBox(g)
+        }
+        else{
+            print("error moving text box")
+        }
     }
     
     func receivedAddTextBox(m: String) {
@@ -312,14 +317,77 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         
         // call moveTextBox and don't send to the server
         let textBox = addTextBox(g)
-        let point = parseMessage(m: m)
-        
-        // put it where it should go
-        textBox.center = point
+        if let point = parseMessage(m: m){
+            textBox.center = point
+        }
+        else{
+            print("error moving text box after adding it")
+        }
     }
     
-    func receivedDrawLine(m: String) {
-        print("will draw line")
+    func receivedTouchesBegan(m: String) {
+        // string should be in format "x20y20" if touches began at point 20, 20
+        let previousVal = participantLastPoint
+        swiped = false
+        participantLastPoint = parseMessage(m: m) ?? previousVal
+    }
+    
+    func receivedTouchesMoved(m: String) {
+        swiped = true
+        
+        // m isn't the same format as it is in receivedTouchesEnded or receivedTouchesBegan
+        print("before:")
+        print(m)
+        let parts = m.split(separator: "\n")
+        print("after")
+        for part in parts {
+            var myString = String(part) // copy the substring to a string
+            print(myString)
+            
+            // is the first char a "1" or a "2"?
+            let firstChar = myString.prefix(1)
+            if(firstChar == "1"){
+                print("1")
+                // add the "\n" back in, parseMessages expects it
+                myString.append("\n")
+                myString.remove(at: myString.startIndex)
+                if let point = parseMessage(m: myString){
+                    drawLine(from: participantLastPoint, to: point)
+                    participantLastPoint = point
+                }
+                else{
+                    print("error parsing message")
+                }
+                
+            }
+            else if (firstChar == "2"){
+                print("2")
+                myString.remove(at: myString.startIndex)
+                receivedTouchesEnded(m: myString)
+            }
+            else {
+                print("uh oh!")
+                print(firstChar)
+            }
+        }
+    }
+    
+    func receivedTouchesEnded(m: String) {
+        print("Will draw line")
+        if typing {
+            return
+        }
+        if !swiped { // if nothing was swiped, then just a single point was drawn
+            drawLine(from: participantLastPoint, to: participantLastPoint)
+        }
+        
+        UIGraphicsBeginImageContext(MainImageView.frame.size)
+        MainImageView.image?.draw(in: view.bounds, blendMode: .normal, alpha: 1.0)
+        TempImageView?.image?.draw(in: view.bounds, blendMode: .normal, alpha: opacity)
+        MainImageView.image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        TempImageView.image = nil
+        
     }
 
     // Button functions
@@ -343,7 +411,7 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         
         // notify the server
         let translation = gesture.translation(in: view) // get the amount moved
-        let message = "\(movedTextBoxString)x\(translation.x)y\(translation.y)".data(using:.utf8)!
+        let message = "\(ServerMessageType.movedTextBoxString)x\(translation.x)y\(translation.y)".data(using:.utf8)!
         print(message)
         print(translation.x)
         print(translation.y)
@@ -387,7 +455,7 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         // notify the server
         let x = gesture.location(in: view).x
         let y = gesture.location(in: view).y
-        let message = "\(addTextBoxString)x\(x)y\(y)".data(using: .utf8)!
+        let message = "\(ServerMessageType.addTextBoxString)x\(x)y\(y)".data(using: .utf8)!
         //let dummyMessage = "I made a text box".data(using: .utf8)!
         connection.sendDataToServer(message: message)
     }

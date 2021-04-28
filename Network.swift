@@ -54,6 +54,7 @@ class networkConnection: NSObject {
         // start 'em up!
         inputStream.open()
         outputStream.open()
+        
     }
     
     // write to server

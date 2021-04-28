@@ -11,7 +11,12 @@ global_data = list()
 
 # global list of users' info, stored in tuples like this: (user_ip, port)
 users_ips = set()
+
+# global hash of users' ips:ports
 users_ips_ports = dict()
+
+# global hash of participant uuid:ip
+uuid_hash = dict()
 
 # global hash of (ip, port):thread
 addr_thread_hash = dict()
@@ -23,20 +28,15 @@ socket_hash = dict()
 	# make a pdf
 	# send it to them in an email? iMessage? get their permission to put it in their iOS file system on the device?
 
-def send_changes_to_user(addr_tuple, message):
+def send_changes_to_user(addr_tuple, send_to_this_ip, message):
     if len(addr_tuple) != 2:
         raise RuntimeError
 
-    ip = addr_tuple[0]
+    addr = (send_to_this_ip, users_ips_ports[send_to_this_ip])
+    s = socket_hash[send_to_this_ip]
+    s.sendto(message, addr)
     print("I'm sending changes to these users: ")
-    for i in users_ips:
-        if i == ip:
-            continue
-
-        print(i)
-        addr = (i, users_ips_ports[i])
-        s = socket_hash[i]
-        s.sendto(message, addr)
+    print(addr)
 
 def listen(conn, addr):
     global global_data
@@ -50,7 +50,16 @@ def listen(conn, addr):
             if addr in users_ips_ports.items():
                 print("The message is " + str(data))
 
-                if data == b'LEAVE':
+                data_arr = data.split(b'\t')
+                if len(data) > 5:
+                    if data_arr[0] == b'HELLO':
+                        my_id = data_arr[1]
+                        their_id = data_arr[2]
+                        uuid_hash[my_id] = addr[0]
+                        print(my_id)
+                        print("new user")
+
+                elif data == b'LEAVE':
                     # remove them from the addr_thread_hash and join the thread
                     try:
                         print("This user is leaving")
@@ -63,9 +72,18 @@ def listen(conn, addr):
                     except KeyError:
                         print("Couldn't find the user who was trying to leave the session")	
                         continue
-                        
+                
+                # get the UUID of the other person in the imessage session
+                message_arr = data.split(b'\t')
+                uuid = message_arr[1]
+
+                # find the ip that corresponds to that uuid
+                try:
+                    send_to_this_ip = uuid_hash[uuid]
+                except KeyError:
+                    continue
                 global_data.append(data)
-                send_changes_to_user(addr, data)
+                send_changes_to_user(addr, send_to_this_ip, data)
     
 
 def serve():

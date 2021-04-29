@@ -17,6 +17,8 @@
 		9AEB50582600717200A0F5A2 /* Messages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB50572600717200A0F5A2 /* Messages.swift */; };
 		9AEB505C2600794E00A0F5A2 /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB505B2600794E00A0F5A2 /* Network.swift */; };
 		9AEB5085261972A500A0F5A2 /* MessagesDelegator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB5084261972A500A0F5A2 /* MessagesDelegator.swift */; };
+		9AEB50A6263B2D7700A0F5A2 /* TextBoxViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB50A5263B2D7700A0F5A2 /* TextBoxViewController.swift */; };
+		9AEB50AF263B38D900A0F5A2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AEB50A9263B389A00A0F5A2 /* Settings.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +59,8 @@
 		9AEB505B2600794E00A0F5A2 /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		9AEB5083261972A500A0F5A2 /* iMessage Whiteboard-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "iMessage Whiteboard-Bridging-Header.h"; sourceTree = "<group>"; };
 		9AEB5084261972A500A0F5A2 /* MessagesDelegator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesDelegator.swift; sourceTree = "<group>"; };
+		9AEB50A5263B2D7700A0F5A2 /* TextBoxViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextBoxViewController.swift; sourceTree = "<group>"; };
+		9AEB50A9263B389A00A0F5A2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +78,7 @@
 		9A7C4E9825C6341B00E3D3A5 = {
 			isa = PBXGroup;
 			children = (
+				9AEB50A9263B389A00A0F5A2 /* Settings.swift */,
 				9AEB505B2600794E00A0F5A2 /* Network.swift */,
 				9AEB5084261972A500A0F5A2 /* MessagesDelegator.swift */,
 				9AEB50572600717200A0F5A2 /* Messages.swift */,
@@ -115,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				9A7C4EB125C6341F00E3D3A5 /* MessagesViewController.swift */,
+				9AEB50A5263B2D7700A0F5A2 /* TextBoxViewController.swift */,
 				9A7C4EB325C6341F00E3D3A5 /* MainInterface.storyboard */,
 				9A7C4EB625C6342000E3D3A5 /* Assets.xcassets */,
 				9A7C4EB825C6342000E3D3A5 /* Info.plist */,
@@ -228,9 +234,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9AEB50AF263B38D900A0F5A2 /* Settings.swift in Sources */,
 				9A7C4EB225C6341F00E3D3A5 /* MessagesViewController.swift in Sources */,
 				9AEB5085261972A500A0F5A2 /* MessagesDelegator.swift in Sources */,
 				9AEB50582600717200A0F5A2 /* Messages.swift in Sources */,
+				9AEB50A6263B2D7700A0F5A2 /* TextBoxViewController.swift in Sources */,
 				9AEB505C2600794E00A0F5A2 /* Network.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

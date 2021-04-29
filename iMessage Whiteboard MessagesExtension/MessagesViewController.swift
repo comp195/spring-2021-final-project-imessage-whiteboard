@@ -11,7 +11,7 @@ import Messages
 import Network
 
 
-class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
+class MessagesViewController: MSMessagesAppViewController, MessagesDelegator, UITextViewDelegate {
     
 
     // the variables needed for drawing
@@ -21,10 +21,12 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
     var participantColor = UIColor.black
     var brushWidth: CGFloat = 10.0
     var opacity: CGFloat = 1.0
+    var fontSize = 15
     var swiped = false
     var participantSwiped = false
     var typing = false
     var participantTyping = false
+    let backgroundColor = UIColor.white
     
     // the variables needed for a network connection from client(s) to server
     let connection = networkConnection()
@@ -40,22 +42,17 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
     @IBOutlet weak var TempImageView: UIImageView!
     @IBOutlet weak var MainImageView: UIImageView!
     @IBOutlet weak var tempTextBoxLabel: UILabel!
+    @IBOutlet weak var settingsView: UIView!
     
-    // Messages functions
+    //
+    // MESSAGE FUNCTIONS
+    //
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        // Do any additional setup after loading the view.
-
-        
     }
     
-    // MARK: - Conversation Handling
-    
     override func willBecomeActive(with conversation: MSConversation) {
-        // Called when the extension is about to move from the inactive to active state.
-        // This will happen when the extension is about to present UI.
-        // Use this method to configure the extension and restore previously stored state.
 
         myID = conversation.localParticipantIdentifier.uuidString
         theirID = conversation.remoteParticipantIdentifiers[0].uuidString
@@ -74,50 +71,17 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
     }
     
     override func didResignActive(with conversation: MSConversation) {
-        // Called when the extension is about to move from the active to inactive state.
-        // This will happen when the user dismisses the extension, changes to a different
-        // conversation or quits Messages.
-        
-        // Use this method to release shared resources, save user data, invalidate timers,
-        // and store enough state information to restore your extension to its current state
-        // in case it is terminated later.
         
         // send a "LEAVE" message to the server
         let message = "LEAVE".data(using: .utf8)!
         connection.sendDataToServer(message: message)
-        
                 
     }
-   
-    override func didReceive(_ message: MSMessage, conversation: MSConversation) {
-        print("received a message")
-       
-    }
+
+    //
+    // UITOUCH FUNCTIONS
+    //
     
-    override func didStartSending(_ message: MSMessage, conversation: MSConversation) {
-        // Called when the user taps the send button.
-    }
-    
-    override func didCancelSending(_ message: MSMessage, conversation: MSConversation) {
-        // Called when the user deletes the message without sending it.
-    
-        // Use this to clean up state related to the deleted message.
-    }
-    
-    override func willTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
-        // Called before the extension transitions to a new presentation style.
-    
-        // Use this method to prepare for the change in presentation style.
-    }
-    
-    override func didTransition(to presentationStyle: MSMessagesAppPresentationStyle) {
-        // Called after the extension transitions to a new presentation style.
-    
-        // Use this method to finalize any behaviors associated with the change in presentation style.
-    }
-    
-    
-    // UITouch Functions
     /* some of the below is code I'm using from a tutorial at https://www.raywenderlich.com/5895-uikit-drawing-tutorial-how-to-make-a-simple-drawing-app */
     
     func drawLine(from fromPoint: CGPoint, to toPoint: CGPoint) {
@@ -250,8 +214,9 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         
     }
     
-    
-    // Delegate functions and helpers
+    //
+    // DELEGATE FUNCTIONS + HELPERS
+    //
     
     func getMyUUID() -> String {
         return myID
@@ -382,8 +347,27 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         TempImageView.image = nil
         
     }
+    
+    func receivedUpdatedText(m: String){
+        let myTextBox = UITextView(frame: CGRect(x:10, y:100, width:view.frame.width/2, height:100))
+        myTextBox.backgroundColor = UIColor.lightGray
+        myTextBox.font = UIFont.systemFont(ofSize: CGFloat(fontSize))
+        myTextBox.text = m
+        myTextBox.autocorrectionType = UITextAutocorrectionType.yes
+        myTextBox.keyboardType = UIKeyboardType.alphabet
+        myTextBox.returnKeyType = UIReturnKeyType.done
+        self.view.addSubview(myTextBox)
+    }
 
-    // Button functions
+    
+    func textViewDidChange(_ textView: UITextView) {
+        myID = self.activeConversation!.localParticipantIdentifier.uuidString
+        theirID = self.activeConversation!.remoteParticipantIdentifiers[0].uuidString
+        let message = "\(myID)\t\(theirID)\(ServerMessageType.updatedTextBoxText.rawValue)x\(textView.text)".data(using:.utf8)!
+        connection.sendDataToServer(message: message)
+        
+    }
+
     @objc func moveTextBox(_ gesture: UIPanGestureRecognizer){
         let translation = gesture.translation(in: view) // get the amount moved
         
@@ -404,7 +388,9 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         
         // notify the server
         let translation = gesture.translation(in: view) // get the amount moved
-        let message = "\(ServerMessageType.movedTextBoxString)x\(translation.x)y\(translation.y)".data(using:.utf8)!
+        myID = self.activeConversation!.localParticipantIdentifier.uuidString
+        theirID = self.activeConversation!.remoteParticipantIdentifiers[0].uuidString
+        let message = "\(myID)\t\(theirID)\(ServerMessageType.movedTextBoxString.rawValue)x\(translation.x)y\(translation.y)".data(using:.utf8)!
         print(message)
         print(translation.x)
         print(translation.y)
@@ -413,18 +399,17 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         
     }
     
-    @objc func addTextBox(_ gesture: UITapGestureRecognizer) -> UITextField {
+    @objc func addTextBox(_ gesture: UITapGestureRecognizer) -> UITextView {
         tempTextBoxLabel.isHidden = true
         
         // make a text box
-        let myTextBox = UITextField(frame: CGRect(x:10, y:100, width:view.frame.width/2, height:40))
-        myTextBox.borderStyle = UITextField.BorderStyle.line
+        let myTextBox = UITextView(frame: CGRect(x:10, y:100, width:view.frame.width/2, height:100))
+        myTextBox.backgroundColor = UIColor.lightGray
         myTextBox.text = "Start typing here!"
-        myTextBox.font = UIFont.systemFont(ofSize: 15)
+        myTextBox.font = UIFont.systemFont(ofSize: CGFloat(fontSize))
         myTextBox.autocorrectionType = UITextAutocorrectionType.yes
         myTextBox.keyboardType = UIKeyboardType.alphabet
         myTextBox.returnKeyType = UIReturnKeyType.done
-        myTextBox.clearButtonMode = UITextField.ViewMode.always
         var point = CGPoint()
         point.x = gesture.location(in: view).x
         point.y = gesture.location(in: view).y
@@ -448,11 +433,17 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
         // notify the server
         let x = gesture.location(in: view).x
         let y = gesture.location(in: view).y
-        let message = "\(ServerMessageType.addTextBoxString)x\(x)y\(y)".data(using: .utf8)!
+        myID = self.activeConversation!.localParticipantIdentifier.uuidString
+        theirID = self.activeConversation!.remoteParticipantIdentifiers[0].uuidString
+        let message = "\(myID)\t\(theirID)\t\(ServerMessageType.addTextBoxString.rawValue)x\(x)y\(y)".data(using: .utf8)!
+        
         //let dummyMessage = "I made a text box".data(using: .utf8)!
         connection.sendDataToServer(message: message)
     }
     
+    //
+    // BUTTON FUNCTIONS
+    //
     
     @IBAction func goToTextMode(_ sender: UIButton) {
         // take them out of drawing mode and into typing mode
@@ -470,4 +461,69 @@ class MessagesViewController: MSMessagesAppViewController, MessagesDelegator {
     @IBAction func goToDrawingMode(_ sender: UIButton) {
         typing = false
     }
+    
+    @IBAction func goToErasingMode(_ sender: UIButton) {
+        typing = false
+        color = backgroundColor
+    }
+    
+    @IBAction func makeFontRed(_ sender: UIButton) {
+        color = UIColor.red
+    }
+    
+    @IBAction func makeFontOrange(_ sender: Any) {
+        color = UIColor.orange
+    }
+    
+    @IBAction func makeFontYellow(_ sender: UIButton) {
+        color = UIColor.yellow
+    }
+    
+    @IBAction func makeFontGreen(_ sender: UIButton) {
+        color = UIColor.green
+    }
+    
+    @IBAction func makeFontBlue(_ sender: UIButton) {
+        color = UIColor.blue
+    }
+    
+    @IBAction func makeFontPurple(_ sender: UIButton) {
+        color = UIColor.purple
+    }
+    
+    @IBAction func makeFontBlack(_ sender: UIButton) {
+        color = UIColor.black
+    }
+    
+    @IBAction func makeFontGray(_ sender: UIButton) {
+        color = UIColor.gray
+    }
+    
+    @IBAction func makeFontPink(_ sender: UIButton) {
+        color = UIColor.systemPink
+    }
+  
+    @IBAction func makeFontSizeSmall(_ sender: UIButton) {
+        fontSize = 10
+    }
+ 
+    
+    @IBAction func makeFontSizeMedium(_ sender: UIButton) {
+        fontSize = 20
+    }
+    
+    @IBAction func makeFontSizeLarge(_ sender: UIButton) {
+        fontSize = 30
+    }
+    
+    @IBAction func showSettings(_ sender: UIButton) {
+        typing = true
+        settingsView.isHidden = false
+    }
+    
+    @IBAction func closeSettings(_ sender: UIButton) {
+        typing = false
+        settingsView.isHidden = true
+    }
+    
 }

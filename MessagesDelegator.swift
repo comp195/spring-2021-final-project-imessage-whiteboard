@@ -14,6 +14,7 @@ protocol MessagesDelegator {
     func receivedTouchesBegan(m: String)
     func receivedTouchesMoved(m: String)
     func receivedTouchesEnded(m: String)
+    func receivedUpdatedText(m: String)
     func getMyUUID() -> String
     func getTheirUUID() -> String
 

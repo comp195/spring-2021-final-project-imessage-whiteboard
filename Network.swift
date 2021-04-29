@@ -15,6 +15,7 @@ enum ServerMessageType: Int {
     case drawLineEndedString = 2
     case addTextBoxString = 3
     case movedTextBoxString = 4
+    case updatedTextBoxText = 5
 }
 
 
@@ -139,6 +140,8 @@ extension networkConnection: StreamDelegate {
                     delegate?.receivedTouchesMoved(m: m)
                 case "\(ServerMessageType.drawLineEndedString.rawValue)":
                     delegate?.receivedTouchesEnded(m: m)
+                case "\(ServerMessageType.updatedTextBoxText.rawValue)":
+                    delegate?.receivedUpdatedText(m: m)
                     
                 default:
                     print("Bad error, couldn't give message back to client")
